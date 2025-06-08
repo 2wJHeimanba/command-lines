@@ -1,0 +1,14 @@
+[workspace]
+members = ["crates/*"]
+
+[workspace.dependencies]
+crossterm = { path = "../crossterm-master" }
+
+[package]
+name = "command-lines"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+crossterm = { workspace = true }
+logic-core = { path = "crates/logic-core" }

@@ -1,0 +1,4 @@
+docker build -t command-lines:0.1.0 -f ./Dockerfile .
+docker save ../command-lines.tar.gz command-line:0.1.0
+docker load -i command-lines.tar.gz
+docker-compose up -d
