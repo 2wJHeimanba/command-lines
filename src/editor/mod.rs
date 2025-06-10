@@ -1,7 +1,7 @@
 #![allow(unused)]
 use std::{io::{stdout, Write}, time::Duration};
 
-use crossterm::{cursor::{position, DisableBlinking, EnableBlinking, MoveDown, MoveTo, MoveUp}, event::{poll, read, Event, KeyCode, KeyModifiers}, execute, queue, style::Print, terminal::{disable_raw_mode, enable_raw_mode, size, Clear, ClearType}};
+use crossterm::{cursor::{position, DisableBlinking, EnableBlinking, MoveDown, MoveTo, MoveUp}, event::{poll, read, Event, KeyCode, KeyModifiers}, execute, queue, style::Print, terminal::{disable_raw_mode, enable_raw_mode, size, window_size, Clear, ClearType, WindowSize}};
 
 use crate::Result;
 
@@ -53,10 +53,15 @@ impl Line {
     Self { content: Vec::new(), is_active: false }
   }
   /// 计算所占可视区行数
-  pub fn calculate_lines(&self, editor: &Editor) -> Result<u16> {
+  pub fn calculate_lines(&self) -> Result<u16> {
+    let WindowSize {
+      width,
+      height,
+      ..
+    } = window_size()?;
     let length = self.content.len() as u16;
-    let mut lines = length / editor.terminal_width;
-    if length % editor.terminal_width != 0 {
+    let mut lines = length / width;
+    if length % height != 0 {
       lines += 1;
     }
     Ok(lines)
@@ -195,9 +200,9 @@ impl Editor {
     let mut start_line_in_buffer = 0;
 
     for (index, val) in self.buffer.iter().enumerate() {
-      total_lines = total_lines + (val.calculate_lines(self)? as i16);
+      total_lines = total_lines + (val.calculate_lines()? as i16);
       if (self.cursor_row as i16) <= total_lines {
-        start_line_in_buffer = total_lines - (val.calculate_lines(self)? as i16);
+        start_line_in_buffer = total_lines - (val.calculate_lines()? as i16);
         position_index = index as u16;
         break;
       }
@@ -233,7 +238,7 @@ impl Editor {
   }
 
   /// 渲染数据上屏
-  fn render(&self) -> Result<()> {
+  fn render(&mut self) -> Result<()> {
     // 1、先移动到开始坐标
     // 2、清空开始坐标之后的内容
     // 3、重新绘制整个内容
@@ -247,6 +252,19 @@ impl Editor {
     )?;
 
     self.buffer.iter().for_each(|item| {
+      
+      let line_count = item.calculate_lines().unwrap();
+
+      if line_count + self.cursor_row >= self.terminal_height {
+        // 表示内容已经超出了范围
+        let distance = line_count+self.cursor_row-self.terminal_height;
+        // 接下来需要滚动预留空间，并维护terminal_scroll_distance字段
+        // 1、滚动到distance+1
+        queue!(stdout, MoveUp(distance+1)).unwrap();
+        // 2、self.terminal_scroll_distance-(distance+1)
+        self.terminal_scroll_distance = self.terminal_scroll_distance - (distance as i16) - 1;
+      }
+
       let strs: String = item.content.iter().map(|i| i.content.to_string()).collect();
       queue!(stdout, Print(strs)).unwrap();
     });

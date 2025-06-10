@@ -3,6 +3,7 @@ members = ["crates/*"]
 
 [workspace.dependencies]
 crossterm = { path = "../crossterm-master" }
+hyper = "1.6.0"
 
 [package]
 name = "command-lines"
