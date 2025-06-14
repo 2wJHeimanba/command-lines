@@ -13,3 +13,8 @@ edition = "2024"
 [dependencies]
 crossterm = { workspace = true }
 logic-core = { path = "crates/logic-core" }
+
+
+[[example]]
+path = "./examples/demo.rs"
+name = "deo"

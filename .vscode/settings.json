@@ -1,0 +1,9 @@
+{
+  "editor.formatOnSave": true,
+  "[rust]": {
+    "editor.defaultFormatter": "rust-lang.rust-analyzer"
+  },
+  // "rust-analyzer.checkOnSave"
+  "rust-analyzer.check.command": "clippy",
+  // "rust-analyzer.check.extraArgs": ["--", "-Dwarnings"]
+}
