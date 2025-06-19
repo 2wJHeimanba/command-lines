@@ -1,6 +1,6 @@
-msrv = "1.65.0" # 最小支持 Rust 版本
+msrv = "1.65.0"                  # 最小支持 Rust 版本
 too-many-arguments-threshold = 7 # 调整参数数量阈值
-disallowed-methods = [
-  { path = "std::vec::Vec::push", reason = "fuck you are stupy" },
-]
+# disallowed-methods = [
+#   { path = "std::vec::Vec::push", reason = "fuck you are stupy" },
+# ]
 cognitive-complexity-threshold = 20
