@@ -1,33 +1,66 @@
-use std::path::PathBuf;
+mod build_util;
+use build_util::{copy_dir, log};
+
+// use std::{env::current_dir, io::{Read, Write}};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-  let mut curr_workspace_path = std::env::current_dir()?;
-  curr_workspace_path.push("static");
+  let current_exe = if let Ok(mut f) = std::env::current_dir() {
+    f.push("static");
+    f
+  } else {
+    log("没有任何内容");
+    panic!("f");
+  };
 
-  let mut target_static_path: PathBuf = std::env::var("OUT_DIR")?.into();
-  target_static_path.push("static");
-  println!("target: {:?}", target_static_path);
-  if !target_static_path.exists() {
-    std::fs::create_dir(&target_static_path)?;
+  let dest_path = if let Ok(f) = std::env::current_exe() {
+    let mut temp_path = f
+      .parent()
+      .unwrap()
+      .to_path_buf()
+      .parent()
+      .unwrap()
+      .parent()
+      .unwrap()
+      .parent()
+      .unwrap()
+      .to_owned();
+
+    let profile = std::env::var("PROFILE").unwrap();
+    temp_path.push(profile);
+    temp_path.push("static");
+    temp_path
+    // let res = temp_path.parent().unwrap().parent().unwrap().to_owned();
+    // log(temp_path.to_str().unwrap());
+    // f.pop();
+    // f.push("static");
+    // f
+  } else {
+    log("目标路径获取失败");
+    panic!()
+  };
+
+  if copy_dir(current_exe, dest_path).is_ok() {
+    log("good: 目录文件复制成功");
+  } else {
+    log("bad: 文件转移失败！");
   }
 
-  #[allow(clippy::collapsible_if)]
-  if curr_workspace_path.exists() {
-    if curr_workspace_path.is_dir() {
-      let origin_entries = std::fs::read_dir(&curr_workspace_path)?;
-      for file in origin_entries {
-        if let Ok(file) = file {
-          if let Ok(file_type) = file.file_type() {
-            if file_type.is_file() {
-              let mut temp_target_file = target_static_path.clone();
-              temp_target_file.push(file.file_name().to_str().unwrap());
-              std::fs::copy(file.path(), temp_target_file)?;
-            }
-          }
-        }
-      }
-    }
-  }
+  // log(&current_exe);
+
+  // let mut cpath = current_dir()?;
+
+  // cpath.push("index.txt");
+
+  // if cpath.exists() {
+  //     let mut content = Vec::new();
+  //     let mut file = std::fs::OpenOptions::new().create(true).read(true).write(true).open(cpath)?;
+  //     file.read_to_end(&mut content)?;
+  //     content.push(58);
+  //     file.write_all(&content);
+  // }else{
+  //     let mut file = std::fs::OpenOptions::new().create(true).write(true).open(cpath)?;
+  //     file.write_all(b"hello world")?;
+  // }
 
   println!("cargo:rerun-if-changed=build.rs");
 

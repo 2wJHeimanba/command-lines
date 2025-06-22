@@ -181,10 +181,10 @@ impl Node {
     node
   }
 
-  pub fn new_text(node_value: String) -> Self {
+  pub fn new_text<T: Display>(node_value: T) -> Self {
     let mut node = Self::new();
     node.node_type = NodeType::Text;
-    node.node_value = Some(node_value);
+    node.node_value = Some(node_value.to_string());
     node
   }
 

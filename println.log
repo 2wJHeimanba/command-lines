@@ -1,0 +1,93 @@
+2025-06-20 21:38:02: Some(
+    "/Users/2wj/Desktop/studio/rust/command-lines/static",
+)
+2025-06-20 21:38:02: Some(
+    "/Users/2wj/Desktop/studio/rust/command-lines/target/debug/build/command-lines-5f1402f1f0897da4/static",
+)
+2025-06-20 21:38:02: "good: 目录文件复制成功"
+2025-06-20 21:38:03: Some(
+    "/Users/2wj/Desktop/studio/rust/command-lines/static",
+)
+2025-06-20 21:38:03: Some(
+    "/Users/2wj/Desktop/studio/rust/command-lines/target/debug/build/command-lines-961cd8c71cb0655b/static",
+)
+2025-06-20 21:38:03: "good: 目录文件复制成功"
+2025-06-20 21:50:37: Some(
+    "/Users/2wj/Desktop/studio/rust/command-lines/static",
+)
+2025-06-20 21:50:37: Some(
+    "/Users/2wj/Desktop/studio/rust/command-lines/target/debug/build/command-lines-5f1402f1f0897da4/static",
+)
+2025-06-20 21:50:37: "good: 目录文件复制成功"
+2025-06-20 21:50:42: Some(
+    "/Users/2wj/Desktop/studio/rust/command-lines/static",
+)
+2025-06-20 21:50:42: Some(
+    "/Users/2wj/Desktop/studio/rust/command-lines/target/debug/build/command-lines-5f1402f1f0897da4/static",
+)
+2025-06-20 21:50:42: "good: 目录文件复制成功"
+2025-06-20 21:50:50: Some(
+    "/Users/2wj/Desktop/studio/rust/command-lines/static",
+)
+2025-06-20 21:50:50: Some(
+    "/Users/2wj/Desktop/studio/rust/command-lines/target/debug/build/command-lines-5f1402f1f0897da4/static",
+)
+2025-06-20 21:50:51: "good: 目录文件复制成功"
+2025-06-20 21:51:06: Some(
+    "/Users/2wj/Desktop/studio/rust/command-lines/static",
+)
+2025-06-20 21:51:06: Some(
+    "/Users/2wj/Desktop/studio/rust/command-lines/target/debug/build/command-lines-5f1402f1f0897da4/static",
+)
+2025-06-20 21:51:06: "good: 目录文件复制成功"
+2025-06-20 21:51:47: "good: 目录文件复制成功"
+2025-06-20 21:52:10: "good: 目录文件复制成功"
+2025-06-20 21:52:30: "good: 目录文件复制成功"
+2025-06-20 22:04:03: "good: 目录文件复制成功"
+2025-06-20 22:04:11: "good: 目录文件复制成功"
+2025-06-20 22:05:51: "/Users/2wj/Desktop/studio/rust/command-lines/target/debug/build/command-lines-5f1402f1f0897da4"
+2025-06-20 22:05:51: "good: 目录文件复制成功"
+2025-06-20 22:06:49: "/Users/2wj/Desktop/studio/rust/command-lines/target/debug/build/command-lines-5f1402f1f0897da4"
+2025-06-20 22:06:49: "good: 目录文件复制成功"
+2025-06-20 22:07:28: "/Users/2wj/Desktop/studio/rust/command-lines/target/debug/build/command-lines-961cd8c71cb0655b"
+2025-06-20 22:07:28: "good: 目录文件复制成功"
+2025-06-20 22:13:04: "debug"
+2025-06-20 22:13:04: "good: 目录文件复制成功"
+2025-06-20 22:15:34: "/Users/2wj/Desktop/studio/rust/command-lines/target/debug/build/command-lines-5f1402f1f0897da4"
+2025-06-20 22:15:34: "good: 目录文件复制成功"
+2025-06-20 22:17:53: "/Users/2wj/Desktop/studio/rust/command-lines/target/debug"
+2025-06-20 22:17:53: "good: 目录文件复制成功"
+2025-06-20 22:19:48: "创建目录文件失败"
+2025-06-20 22:19:48: "bad: 文件转移失败！"
+2025-06-20 22:20:08: Some(
+    "/Users/2wj/Desktop/studio/rust/command-lines/static",
+)
+2025-06-20 22:20:08: Some(
+    "/Users/2wj/Desktop/studio/rust/command-lines/target/debug/debug/static",
+)
+2025-06-20 22:20:08: "创建目录文件失败"
+2025-06-20 22:20:08: "bad: 文件转移失败！"
+2025-06-20 22:20:25: Some(
+    "/Users/2wj/Desktop/studio/rust/command-lines/static",
+)
+2025-06-20 22:20:25: Some(
+    "/Users/2wj/Desktop/studio/rust/command-lines/target/debug/static",
+)
+2025-06-20 22:20:25: "good: 目录文件复制成功"
+2025-06-20 22:20:46: Some(
+    "/Users/2wj/Desktop/studio/rust/command-lines/static",
+)
+2025-06-20 22:20:46: Some(
+    "/Users/2wj/Desktop/studio/rust/command-lines/target/debug/static",
+)
+2025-06-20 22:20:46: "good: 目录文件复制成功"
+2025-06-20 22:20:59: "good: 目录文件复制成功"
+2025-06-20 22:21:06: "good: 目录文件复制成功"
+2025-06-21 00:04:09: "good: 目录文件复制成功"
+2025-06-21 00:12:00: "good: 目录文件复制成功"
+2025-06-21 06:38:08: "good: 目录文件复制成功"
+2025-06-21 06:38:11: "good: 目录文件复制成功"
+2025-06-21 11:48:04: "good: 目录文件复制成功"
+2025-06-21 11:49:21: "good: 目录文件复制成功"
+2025-06-22 00:54:51: "good: 目录文件复制成功"
+2025-06-22 06:19:08: "good: 目录文件复制成功"
