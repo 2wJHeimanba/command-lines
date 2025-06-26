@@ -218,6 +218,15 @@ impl Service<Request<Incoming>> for PathStore {
 
     info!("request path: {path}");
 
+    if path.starts_with("/") {
+      let mut temp_path = path.to_string();
+      temp_path.remove(0);
+      let files = self.get_files().unwrap();
+      if files.contains(&temp_path) {
+        // 需要处理路由重定向
+      }
+    }
+
     match path {
       "/" => {
         let res = self.make_response().unwrap();

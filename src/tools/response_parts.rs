@@ -6,7 +6,10 @@ pub fn make_response_parts(ext: &str) -> Result<HeaderMap> {
   let mut header = HeaderMap::new();
   match ext {
     "html" => {
-      header.append(header::CONTENT_TYPE, "text/html".parse().unwrap());
+      header.append(
+        header::CONTENT_TYPE,
+        mime::TEXT_HTML.as_ref().parse().unwrap(),
+      );
       header.append(
         header::CACHE_CONTROL,
         "max-age=3600, public".parse().unwrap(),
