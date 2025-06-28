@@ -10,10 +10,10 @@ pub fn make_response_parts(ext: &str) -> Result<HeaderMap> {
         header::CONTENT_TYPE,
         mime::TEXT_HTML.as_ref().parse().unwrap(),
       );
-      header.append(
-        header::CACHE_CONTROL,
-        "max-age=3600, public".parse().unwrap(),
-      );
+      // header.append(
+      //   header::CACHE_CONTROL,
+      //   "max-age=3600, public".parse().unwrap(),
+      // );
     }
     "ico" => {
       header.insert(header::CONTENT_TYPE, "image/x-icon".parse().unwrap());

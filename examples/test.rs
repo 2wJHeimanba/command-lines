@@ -5,7 +5,7 @@ trait People {
   // type Age = i32;
   const LANGUAGE: &'static str = "wenjian";
   const NAME: i32;
-
+  async fn test() -> String;
   fn new() -> Self;
   fn get_name(&self);
 
@@ -26,6 +26,9 @@ impl People2 for Person {}
 impl People for Person {
   const NAME: i32 = 23;
   type Gender = String;
+  async fn test() -> String {
+    todo!()
+  }
   fn new() -> Self {
     Person
   }

@@ -6,7 +6,7 @@ use command_lines::{
 };
 use http_body_util::Full;
 use hyper::{
-  Request, Response,
+  Request, Response, StatusCode,
   body::{Body, Incoming},
   header,
   service::Service,
@@ -116,11 +116,12 @@ impl PathStore {
 
   // 获取当前路径下的文件
   fn get_files(&self) -> Option<Vec<String>> {
-    let curr_path = if let Ok(val) = self.base_path.lock() {
+    let curr_path: PathBuf = if let Ok(val) = self.current_path.lock() {
       val.clone()
     } else {
       return None;
     };
+    // info!("当前路径：{:?}", curr_path);
     if curr_path.is_dir() {
       let mut temp_vec = Vec::new();
 
@@ -137,33 +138,43 @@ impl PathStore {
     None
   }
 
+  fn handle_empty(&self) -> Result<String> {
+    todo!()
+  }
+
   // 将文件转成node结构数据
   fn to_nodes(&self) -> Result<String> {
     let file_list = self.get_files().ok_or("获取文件列表失败")?;
-
+    info!("files: {:?}", file_list);
     let mut container = node::Node::new_node(NodeName::Div);
     container.attr_insert(
       "style",
-      "display: grid; grid-template-columns: 1fr 1fr 1fr;grid-row-gap: 3px;grid-column-gap: 10px;border: 2px solid cyan;",
+      "display: grid; grid-template-columns: 1fr 1fr 1fr;grid-row-gap: 3px;grid-column-gap: 10px;",
     )?;
     let mut base_file_path = self.current_path.lock().map(|item| item.clone()).unwrap();
-    for file in file_list {
-      base_file_path.push(&file);
-      if base_file_path.is_file() {
-        let mut node = node::Node::new_node(NodeName::A);
-        let text_node = node::Node::new_text(&file);
-        node.append_child(text_node)?;
-        node.attr_insert("style", "color: blue;")?;
-        node.attr_insert("href", &format!("/{}", &file))?;
-        container.append_child(node)?;
-      } else if base_file_path.is_dir() {
-        let mut node = node::Node::new_node(NodeName::Div);
-        let text_node = node::Node::new_text(&file);
-        node.append_child(text_node)?;
-        let _ = node.attr_insert("style", "color: red;");
-        let _ = container.append_child(node);
+    if !file_list.is_empty() {
+      for file in file_list {
+        base_file_path.push(&file);
+        if base_file_path.is_file() {
+          let mut node = node::Node::new_node(NodeName::A);
+          let text_node = node::Node::new_text(&file);
+          node.append_child(text_node)?;
+          node.attr_insert("style", "color: red;")?;
+          node.attr_insert("href", &format!("/{}", &file))?;
+          container.append_child(node)?;
+        } else if base_file_path.is_dir() {
+          let mut node = node::Node::new_node(NodeName::A);
+          let text_node = node::Node::new_text(&file);
+          node.append_child(text_node)?;
+          let _ = node.attr_insert("style", "color: orange;");
+          let _ = node.attr_insert("href", &format!("/{}", &file));
+          let _ = container.append_child(node);
+        }
+        base_file_path.pop();
       }
-      base_file_path.pop();
+    } else {
+      let empty_text = node::Node::new_text("文件夹内容为空");
+      container.append_child(empty_text)?;
     }
 
     let mut html = node::Node::new_node(NodeName::Html);
@@ -178,7 +189,10 @@ impl PathStore {
 
     let mut body = node::Node::new_node(NodeName::Body);
     let mut head_route = node::Node::new_node(NodeName::Div);
-    head_route.append_child(node::Node::new_text("上一级"))?;
+    let mut back_element = node::Node::new_node(NodeName::A);
+    back_element.append_child(node::Node::new_text("返回上一级"))?;
+    back_element.attr_insert("href", "/back")?;
+    head_route.append_child(back_element)?;
     body.append_child(head_route)?;
     body.append_child(container)?;
     html.append_child(body)?;
@@ -204,6 +218,39 @@ impl PathStore {
       },
     )
   }
+
+  // 处理路由重定向
+  fn handle_redirect(&self, pathname: String) -> Result<Response<Full<Bytes>>> {
+    // let res = self.current_path.lock().map(|i| i.clone()).unwrap();
+    // 更新当前路径
+    let mut res = self.current_path.lock().unwrap();
+    res.push(pathname);
+
+    if res.is_dir() {
+      Ok(
+        Response::builder()
+          .status(StatusCode::FOUND)
+          .header(header::LOCATION, "/")
+          .body(Full::new(Bytes::from("nothing")))
+          .unwrap(),
+      )
+    } else {
+      Err("fds".into())
+    }
+  }
+
+  // 处理返回上一级逻辑
+  fn handle_back(&self) -> Result<Response<Full<Bytes>>> {
+    self.current_path.lock().unwrap().pop();
+
+    let response = Response::builder()
+      .status(StatusCode::FOUND)
+      .header(header::LOCATION, "/")
+      .body(Full::new(Bytes::new()))
+      .unwrap();
+
+    Ok(response)
+  }
 }
 
 impl Service<Request<Incoming>> for PathStore {
@@ -217,15 +264,6 @@ impl Service<Request<Incoming>> for PathStore {
     let path = req.uri().path();
 
     info!("request path: {path}");
-
-    if path.starts_with("/") {
-      let mut temp_path = path.to_string();
-      temp_path.remove(0);
-      let files = self.get_files().unwrap();
-      if files.contains(&temp_path) {
-        // 需要处理路由重定向
-      }
-    }
 
     match path {
       "/" => {
@@ -243,6 +281,21 @@ impl Service<Request<Incoming>> for PathStore {
         }
       }
       _ => {}
+    }
+
+    if path.starts_with("/") {
+      let mut temp_path = path.to_string();
+      temp_path.remove(0);
+      let files = self.get_files().unwrap();
+      if temp_path == "back" {
+        // 返回上一级
+        let res = self.handle_back().unwrap();
+        return Box::pin(async { Ok(res) });
+      } else if files.contains(&temp_path) {
+        // 需要处理路由重定向
+        let res = self.handle_redirect(temp_path).unwrap();
+        return Box::pin(async { Ok(res) });
+      }
     }
 
     let result = if let Ok(val) = self.handle_static_file_response("nothing.html") {
