@@ -236,6 +236,7 @@ impl PathStore {
       );
     } else if curr_path.is_file() {
       // 需要处理浏览器
+      let res = curr_path.display();
       let file_while_list = ["html", "css", "js", "png", "jpg"];
       let ext = curr_path
         .extension()
