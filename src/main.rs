@@ -121,7 +121,7 @@ impl PathStore {
     } else {
       return None;
     };
-    // info!("当前路径：{:?}", curr_path);
+    info!("当前路径：{:?}", curr_path);
     if curr_path.is_dir() {
       let mut temp_vec = Vec::new();
 
@@ -145,7 +145,7 @@ impl PathStore {
   // 将文件转成node结构数据
   fn to_nodes(&self) -> Result<String> {
     let file_list = self.get_files().ok_or("获取文件列表失败")?;
-    info!("files: {:?}", file_list);
+    // info!("files: {:?}", file_list);
     let mut container = node::Node::new_node(NodeName::Div);
     container.attr_insert(
       "style",
@@ -221,22 +221,56 @@ impl PathStore {
 
   // 处理路由重定向
   fn handle_redirect(&self, pathname: String) -> Result<Response<Full<Bytes>>> {
-    // let res = self.current_path.lock().map(|i| i.clone()).unwrap();
     // 更新当前路径
-    let mut res = self.current_path.lock().unwrap();
-    res.push(pathname);
+    let mut curr_path = self.current_path.lock().unwrap();
+    curr_path.push(pathname);
 
-    if res.is_dir() {
-      Ok(
+    if curr_path.is_dir() {
+      info!("是文件");
+      return Ok(
         Response::builder()
           .status(StatusCode::FOUND)
           .header(header::LOCATION, "/")
           .body(Full::new(Bytes::from("nothing")))
           .unwrap(),
-      )
-    } else {
-      Err("fds".into())
+      );
+    } else if curr_path.is_file() {
+      // 需要处理浏览器
+      let file_while_list = ["html", "css", "js", "png", "jpg"];
+      let ext = curr_path
+        .extension()
+        .expect("获取后缀名失败")
+        .to_str()
+        .unwrap();
+      println!("文件后缀：{:?}", ext);
+      if file_while_list.contains(&ext) {
+        // 读取文件返回
+        let mut content = Vec::new();
+        let mut file = std::fs::OpenOptions::new()
+          .read(true)
+          .open(&*curr_path)
+          .unwrap();
+        let count = file.read_to_end(&mut content).unwrap();
+        info!("读取的内容长度: {:?}", count);
+        curr_path.pop();
+        return Ok(
+          Response::builder()
+            .status(StatusCode::OK)
+            .header(header::CONTENT_LENGTH, count)
+            .header(header::CONTENT_TYPE, mime::TEXT_HTML_UTF_8.to_string())
+            .body(Full::new(Bytes::from(content)))
+            .unwrap(),
+        );
+      }
     }
+    info!("回到上一级");
+    curr_path.pop();
+
+    Ok(
+      Response::builder()
+        .body(Full::new(Bytes::from("")))
+        .unwrap(),
+    )
   }
 
   // 处理返回上一级逻辑
@@ -286,14 +320,21 @@ impl Service<Request<Incoming>> for PathStore {
     if path.starts_with("/") {
       let mut temp_path = path.to_string();
       temp_path.remove(0);
-      let files = self.get_files().unwrap();
       if temp_path == "back" {
         // 返回上一级
         let res = self.handle_back().unwrap();
         return Box::pin(async { Ok(res) });
-      } else if files.contains(&temp_path) {
+      }
+      let files = self.get_files().expect("获取文件失败");
+      if files.contains(&temp_path) {
         // 需要处理路由重定向
-        let res = self.handle_redirect(temp_path).unwrap();
+        let res = match self.handle_redirect(temp_path) {
+          Ok(val) => val,
+          Err(error) => {
+            info!("报错提示: {:?}", error);
+            panic!();
+          }
+        };
         return Box::pin(async { Ok(res) });
       }
     }
